@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import { useLocation, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import { AuthProvider } from './components/AuthProvider';
+import { AuthProvider } from './context/AuthProvider';
 
 function App() {
 

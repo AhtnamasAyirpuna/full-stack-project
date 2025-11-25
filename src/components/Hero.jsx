@@ -5,7 +5,7 @@ const Hero = () => {
     return (
         <div className='flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 text-white bg-[url("https://www.disneytouristblog.com/wp-content/uploads/2025/11/conrad-orlando-evermore-resort-hotel-near-disney-world-2526.jpg")] bg-no-repeat bg-cover bg-center h-screen'>
             <p className='bg-[#49B9FF]/50 px-3.5 py-1 rounded-full mt-20'>Looking For A Getaway?</p>
-            <h1 className='font-playfair text-2xl md:text-5xl md:text-[56px] md: leading-[56px] font-bold md:font-extrabold max-w-xl mt-4'>Your Journey Begins With Us</h1>
+            <h1 className='font-playfair text-2xl md:text-5xl md:text-[56px] md:leading-[56px] font-bold md:font-extrabold max-w-xl mt-4'>Your Journey Begins With Us</h1>
             <p className='max-w-130 mt-2 text-sm md:text-base'>Discover great hotels with ease. Compare prices, explore amenities, and book
                 your ideal stay in just a few clicks</p>
 

@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets';
+import { useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
     const navLinks = [
@@ -12,6 +17,10 @@ const Navbar = () => {
 
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+    const [showLogin, setShowLogin] = useState(false);
+
+    const { currentUser } = useContext(AuthContext);
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -27,7 +36,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link to='/' className='flex items-center'>
                 <img src={assets.logo} alt="logo" className={`h-9 ${isScrolled && "invert opacity-80"}`} />
-                <p className='text-white text-3xl font-semibold font-sans'>My Cozy Stay</p>
+                <p className={`text-white text-3xl font-semibold font-sans ${isScrolled ? "text-gray-800" : "text-white"}`}>My Cozy Stay</p>
             </Link>
 
             {/* Desktop Nav */}
@@ -46,9 +55,15 @@ const Navbar = () => {
             {/* Desktop Right */}
             <div className="hidden md:flex items-center gap-4">
                 <img src={assets.search} alt="search" className={`${isScrolled && 'invert'} h-7 transition-all duration-500`} />
-                <button className={`px-8 py-2.5 rounded-full ml-4 transition-all duration-500 ${isScrolled ? "text-white bg-black" : "bg-white text-black"}`}>
-                    Login
-                </button>
+                {currentUser ? (
+                    <button onClick={() => signOut(auth)} className="text-red-500">
+                        Logout
+                    </button>
+                ) : (
+                    <button onClick={() => setShowLogin(true)} className={`px-8 py-2.5 rounded-full ml-4 transition-all duration-500 ${isScrolled ? "text-white bg-black" : "bg-white text-black"}`}>
+                        Login
+                    </button>
+                )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -72,10 +87,17 @@ const Navbar = () => {
                     Dashboard
                 </button>
 
-                <button className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500">
-                    Login
-                </button>
+                {currentUser ? (
+                    <button onClick={() => signOut(auth)} className="text-red-500">
+                        Logout
+                    </button>
+                ) : (
+                    <button onClick={() => setShowLogin(true)} className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500">
+                        Login
+                    </button>
+                )}
             </div>
+            {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
         </nav>
     );
 }
