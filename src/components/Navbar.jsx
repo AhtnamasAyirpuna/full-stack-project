@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { assets } from '../assets';
 import { useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
@@ -21,6 +21,11 @@ const Navbar = () => {
     const [showLogin, setShowLogin] = useState(false);
 
     const { currentUser } = useContext(AuthContext);
+
+    {/* look into this part again
+        const BookIcon = () => {
+        <img src={assets.book} alt="logo" className={`h-9 ${isScrolled && "invert opacity-80"}`} />
+    }*/}
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -56,9 +61,14 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-4">
                 <img src={assets.search} alt="search" className={`${isScrolled && 'invert'} h-7 transition-all duration-500`} />
                 {currentUser ? (
-                    <button onClick={() => signOut(auth)} className="text-red-500">
-                        Logout
-                    </button>
+                    <>
+                        <NavLink to="/my-bookings" className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
+                            My Bookings
+                        </NavLink>
+                        <button onClick={() => signOut(auth)} className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
+                            Logout
+                        </button>
+                    </>
                 ) : (
                     <button onClick={() => setShowLogin(true)} className={`px-8 py-2.5 rounded-full ml-4 transition-all duration-500 ${isScrolled ? "text-white bg-black" : "bg-white text-black"}`}>
                         Login
@@ -88,7 +98,7 @@ const Navbar = () => {
                 </button>
 
                 {currentUser ? (
-                    <button onClick={() => signOut(auth)} className="text-red-500">
+                    <button onClick={() => signOut(auth)} className="text-white-500">
                         Logout
                     </button>
                 ) : (
