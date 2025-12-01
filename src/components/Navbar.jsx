@@ -1,7 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { assets } from '../assets';
-import { useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
@@ -15,19 +14,14 @@ const Navbar = () => {
         { name: 'About', path: '/' },
     ];
 
-    const [isScrolled, setIsScrolled] = React.useState(false);
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const [showLogin, setShowLogin] = useState(false);
 
     const { currentUser } = useContext(AuthContext);
 
-    {/* look into this part again
-        const BookIcon = () => {
-        <img src={assets.book} alt="logo" className={`h-9 ${isScrolled && "invert opacity-80"}`} />
-    }*/}
-
-    React.useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -52,9 +46,6 @@ const Navbar = () => {
                         <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
                     </a>
                 ))}
-                <button className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? 'text-black' : 'text-white'} transition-all`}>
-                    Dashboard
-                </button>
             </div>
 
             {/* Desktop Right */}
@@ -93,14 +84,15 @@ const Navbar = () => {
                     </a>
                 ))}
 
-                <button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all">
-                    Dashboard
-                </button>
-
                 {currentUser ? (
-                    <button onClick={() => signOut(auth)} className="text-white-500">
-                        Logout
-                    </button>
+                    <>
+                        <a href="/my-bookings" onClick={() => setIsMenuOpen(false)}>
+                            My Bookings
+                        </a>
+                        <button onClick={() => signOut(auth)} className="text-white-500">
+                            Logout
+                        </button>
+                    </>
                 ) : (
                     <button onClick={() => setShowLogin(true)} className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500">
                         Login
