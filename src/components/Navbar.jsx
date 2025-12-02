@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { assets } from '../assets';
 import { AuthContext } from '../context/AuthContext';
@@ -26,7 +26,7 @@ const Navbar = () => {
     useEffect(() => {
         const isHome = location.pathname === '/';
         if (!isHome) {
-            Promise.resolve().then(() => setIsScrolled(true));
+            Promise.resolve().then(() => setIsScrolled(true)); //if navbar not at homepage, it will look scrolled
             return;
         }
         const handleScroll = () => {
