@@ -43,7 +43,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link to='/' className='flex items-center'>
                 <img src={assets.logo} alt="logo" className={`h-9 ${isScrolled && "invert opacity-80"}`} />
-                <p className={`text-white text-3xl font-semibold font-sans ${isScrolled ? "text-gray-800" : "text-white"}`}>My Cozy Stay</p>
+                <p className={`text-white text-3xl font-semibold font-sans ${isScrolled ? "invert opacity-80" : "text-white"}`}>My Cozy Stay</p>
             </Link>
 
             {/* Desktop Nav */}
