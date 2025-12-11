@@ -3,7 +3,7 @@ import { assets } from '../assets'
 
 const HotelCard = ({ room, index }) => {
     return (
-        <Link to={'/rooms/' + room._id} onClick={() => scrollTo(0, 0)} key={room._id} className='relative'>
+        <Link to={'/rooms/' + room.id} onClick={() => scrollTo(0, 0)} key={room.id} className='relative'>
             <img src={room.images[0]} alt="" className='w-full h-48 object-cover rounded-xl overflow-hidden bg-white text-gray-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)]' />
             {index % 2 === 0 && <p className='px-3 py-1 absolute top-3 left-3 text-xs bg-white text-gray-800 font-medium rounded-full'>Best Seller</p>
             }
