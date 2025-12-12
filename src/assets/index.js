@@ -5,6 +5,11 @@ import close from './close.svg';
 import star from './star.svg';
 import location from './location.svg';
 import calendar from './calendar.svg';
+import freeWifi from './freeWifi.svg';
+import mountain from './mountain.svg';
+import pool from './pool.svg';
+import roomService from './roomService.svg';
+import breakfast from './breakfast.svg';
 
 export const assets = {
     logo,
@@ -14,6 +19,11 @@ export const assets = {
     calendar,
     star,
     location,
+    freeWifi,
+    mountain,
+    pool,
+    roomService,
+    breakfast,
 };
 
 export const cities = [
@@ -22,5 +32,13 @@ export const cities = [
     "New York",
     "London",
 ];
+
+export const facilityIcons = {
+    "Free WiFi": assets.freeWifi,
+    "Free Breakfast": assets.breakfast,
+    "Room Service": assets.roomService,
+    "Mountain View": assets.mountain,
+    "Pool Access": assets.pool,
+};
 
 
