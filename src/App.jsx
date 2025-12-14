@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthProvider';
 import AllRooms from './pages/AllRooms';
 import RoomDetails from './pages/RoomDetails';
 import MyBookings from './pages/MyBookings';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
 
@@ -20,7 +21,14 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/rooms" element={<AllRooms />} />
             <Route path="/rooms/:id" element={<RoomDetails />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
+
+            <Route path="/my-bookings"
+              element={
+                <ProtectedRoute>
+                  <MyBookings />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </div>
