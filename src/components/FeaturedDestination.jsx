@@ -1,7 +1,5 @@
 import HotelCard from './HotelCard'
 import Title from './Title'
-import { collection, getDocs } from "firebase/firestore"
-import { db } from "../firebase";
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
@@ -11,16 +9,14 @@ const FeaturedDestination = () => {
 
     useEffect(() => {
         const fetchRooms = async () => {
-            const roomCollection = collection(db, "rooms");
-            const snapshot = await getDocs(roomCollection);
-
-            const data = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setRooms(data);
+            try {
+                const res = await fetch("http://localhost:3000/api/rooms");
+                const data = await res.json();
+                setRooms(data);
+            } catch (error) {
+                console.error("Error loading rooms:", error);
+            }
         };
-
         fetchRooms();
     }, []);
 

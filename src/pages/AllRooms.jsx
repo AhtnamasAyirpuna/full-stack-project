@@ -1,31 +1,58 @@
-import { useNavigate } from 'react-router-dom'
-import { collection, getDocs } from "firebase/firestore"
-import { db } from "../firebase";
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { assets, facilityIcons } from '../assets';
 
 const AllRooms = () => {
+
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
     const [rooms, setRooms] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const city = searchParams.get("city") || "all";
+    const checkInDate = searchParams.get("checkInDate");
+    const checkOutDate = searchParams.get("checkOutDate");
 
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const roomCollection = collection(db, "rooms");
-                const snapshot = await getDocs(roomCollection);
+                setLoading(true);
 
-                const data = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setRooms(data);
+                if (city && checkInDate && checkOutDate) {
+                    const query = new URLSearchParams({
+                        city,
+                        checkInDate,
+                        checkOutDate,
+                    }).toString();
+
+                    const res = await fetch(`http://localhost:3000/api/rooms/search?${query}`);
+
+                    const data = await res.json()
+                    setRooms(data)
+                }
+                else {
+                    const res = await fetch("http://localhost:3000/api/rooms");
+                    const data = await res.json();
+                    setRooms(data);
+                }
             } catch (error) {
                 console.error("Error loading rooms:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchRooms();
-    }, []);
+    }, [city, checkInDate, checkOutDate]);
+
+    if (loading) {
+        return <p className='pt-40 text-center'>Loading rooms...</p>
+    }
+
+    if (!rooms.length) {
+        return <p className='pt-40 text-center'>No rooms available</p>
+    }
 
     return (
         <div className='flex flex-col-reverse lg:flex-row items-start justify-between pt-28 md:pt-35 px-4 md:px-16 lg:px-24 xl:px-32'>
@@ -60,10 +87,6 @@ const AllRooms = () => {
                         </div>
                     </div>
                 ))}
-            </div>
-            {/* Filter */}
-            <div>
-
             </div>
         </div>
     )

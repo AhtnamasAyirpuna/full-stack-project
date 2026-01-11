@@ -27,10 +27,11 @@ export const assets = {
 };
 
 export const cities = [
-    "Dubai",
-    "Singapore",
-    "New York",
-    "London",
+
+    "Selangor",
+    "Johor",
+    "Penang",
+    "Kuala Lumpur",
 ];
 
 export const facilityIcons = {

@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { collection, getDocs } from "firebase/firestore"
-import { db } from "../firebase";
 import { useParams } from 'react-router-dom';
 import { assets, facilityIcons } from '../assets'
 
@@ -8,28 +6,37 @@ const RoomDetails = () => {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [mainImage, setMainImage] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchRooms = async () => {
+        const fetchRoom = async () => {
             try {
-                const roomCollection = collection(db, "rooms");
-                const snapshot = await getDocs(roomCollection);
-                const rooms = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                const res = await fetch(`http://localhost:3000/api/rooms/${id}`);
+                if (!res.ok) {
+                    throw new Error("Room not found");
+                }
 
-                const room = rooms.find(room => room.id === id)
-                room && setRoom(room)
-                room && setMainImage(room.images[0])
+                const data = await res.json();
+                setRoom(data)
+                setMainImage(data.images?.[0])
             } catch (error) {
                 console.error("Error loading room:", error);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchRooms();
-    }, [id]); //id is the dependancy
+        fetchRoom();
+    }, [id]);
 
-    return room && (
+    if (loading) {
+        return <p className="pt-40 text-center">Loading room...</p>;
+    }
+
+    if (!room) {
+        return <p className="pt-40 text-center">Room not found</p>;
+    }
+
+    return (
         <div className='py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32'>
             {/* Room Details */}
             <div className='flex flex-col md:flex-row items-start md:items-center gap-2'>

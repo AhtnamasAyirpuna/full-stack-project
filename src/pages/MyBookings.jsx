@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import Title from '../components/Title'
-import { collection, getDocs, getDoc } from "firebase/firestore"
-import { db } from "../firebase";
 import { assets } from '../assets';
-
+import { getAuth } from "firebase/auth"
 
 const MyBookings = () => {
     const [bookings, setBookings] = useState([])
@@ -11,29 +9,27 @@ const MyBookings = () => {
     useEffect(() => {
         const fetchBooking = async () => {
             try {
-                const bookingSnap = await getDocs(collection(db, "bookings"));
+                const auth = getAuth();
+                const user = auth.currentUser;
 
-                const bookingWithRooms = await Promise.all(
-                    bookingSnap.docs.map(async (doc) => {
-                        const bookingData = doc.data()
-                        const roomSnap = await getDoc(bookingData.room)
-                        const roomData = roomSnap.exists() ? roomSnap.data() : null
+                if (!user) return;
 
-                        return {
-                            id: doc.id,
-                            ...bookingData,
-                            room: roomData
-                        }
-                    })
-                )
+                const token = await user.getIdToken();
 
-                setBookings(bookingWithRooms);
+                const res = await fetch("http://localhost:3000/api/bookings/my", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = await res.json();
+                setBookings(data);
 
             } catch (error) {
                 console.error("Error loading booking:", error);
             }
-        }
-        fetchBooking()
+        };
+        fetchBooking();
     }, []);
 
     return (
@@ -53,7 +49,7 @@ const MyBookings = () => {
                         <div className='flex flex-col md:flex-row'>
                             <img src={booking.room?.images?.[0]} alt="hotel-img" className='min-md:w-44 rounded shadow object-cover' />
                             <div className='flex flex-col gap-1.5 max-md:mt-3 min-md:ml-4'>
-                                <p className='font-playfair text-2xl'>{booking.room.hotel.name}</p>
+                                <p className='font-playfair text-2xl'>{booking.room?.hotel?.name ?? "Hotel unavailable"}</p>
                                 <div className='flex items-center gap-1 text-sm text-gray-500'>
                                     <img src={assets.location} alt="location-icon" className='h-4' />
                                     <span>{booking.room.address}</span>
@@ -66,13 +62,13 @@ const MyBookings = () => {
                             <div>
                                 <p>Check-In:</p>
                                 <p className='text-gray-500 text-sm'>
-                                    {booking.checkInDate.toDate().toDateString()}
+                                    {new Date(booking.checkInDate).toDateString()}
                                 </p>
                             </div>
                             <div>
                                 <p>Check-Out:</p>
                                 <p className='text-gray-500 text-sm'>
-                                    {booking.checkOutDate.toDate().toDateString()}
+                                    {new Date(booking.checkOutDate).toDateString()}
                                 </p>
                             </div>
                         </div>
