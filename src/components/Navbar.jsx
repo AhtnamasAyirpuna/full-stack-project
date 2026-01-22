@@ -5,19 +5,19 @@ import { AuthContext } from '../context/AuthContext';
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import LoginModal from './LoginModal';
+import SignUpModal from './SignUpModal';
 
 const Navbar = () => {
     const navLinks = [
         { name: 'Home', path: '/' },
-        { name: 'Hotels', path: '/rooms' },
-        { name: 'Experience', path: '/' },
-        { name: 'About', path: '/' },
+        { name: 'Hotels', path: '/rooms' }
     ];
 
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const [showLogin, setShowLogin] = useState(false);
+    const [showSignup, setShowSignup] = useState(false);
 
     const { currentUser } = useContext(AuthContext);
     const location = useLocation();
@@ -69,7 +69,6 @@ const Navbar = () => {
 
             {/* Desktop Right */}
             <div className="hidden md:flex items-center gap-4">
-                <img src={assets.search} alt="search" className={`${isScrolled && 'invert'} h-7 transition-all duration-500`} />
                 {currentUser ? (
                     <>
                         <NavLink to="/my-bookings" className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
@@ -118,7 +117,19 @@ const Navbar = () => {
                     </button>
                 )}
             </div>
-            {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+            {showLogin && (<LoginModal onClose={() => setShowLogin(false)} switchToSignup={() => {
+                setShowLogin(false);
+                setShowSignup(true);
+            }}
+            />
+            )}
+
+            {showSignup && (<SignUpModal onClose={() => setShowSignup(false)} switchToLogin={() => {
+                setShowSignup(false);
+                setShowLogin(true);
+            }}
+            />
+            )}
         </nav>
     );
 }

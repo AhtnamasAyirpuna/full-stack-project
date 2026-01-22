@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { assets, facilityIcons } from '../assets'
+import { getAuth } from 'firebase/auth'
 
 const RoomDetails = () => {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [mainImage, setMainImage] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [checkInDate, setCheckInDate] = useState("");
+    const [checkOutDate, setCheckOutDate] = useState("");
+    const [checking, setChecking] = useState(false);
 
     useEffect(() => {
         const fetchRoom = async () => {
@@ -35,6 +39,74 @@ const RoomDetails = () => {
     if (!room) {
         return <p className="pt-40 text-center">Room not found</p>;
     }
+
+    const handleBooking = async (e) => {
+        e.preventDefault();
+
+        if (!checkInDate || !checkOutDate) {
+            alert("Please select dates");
+            return;
+        }
+
+        try {
+            setChecking(true);
+
+            //to check availability
+            const availabilityRes = await fetch(
+                `http://localhost:3000/api/rooms/check/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+            );
+
+            const availabilityData = await availabilityRes.json();
+
+            if (!availabilityData.available) {
+                alert("Room is not available for selected dates");
+                return;
+            }
+
+            const auth = getAuth();
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Please login to book");
+                return
+            }
+
+            const token = await user.getIdToken();
+
+            //create booking
+            const bookingRes = await fetch(
+                "http://localhost:3000/api/bookings",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        roomId: id,
+                        checkInDate,
+                        checkOutDate
+                    })
+                }
+            );
+
+            const bookingData = await bookingRes.json();
+
+            if (!bookingRes.ok) {
+                throw new Error(bookingData.message || "Booking failed");
+            }
+
+            alert("Booking successful");
+
+            console.log("Booking created:", bookingData);
+
+        } catch (error) {
+            console.error(error);
+            alert("Error checking availability");
+        } finally {
+            setChecking(false);
+        }
+    };
 
     return (
         <div className='py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32'>
@@ -77,28 +149,24 @@ const RoomDetails = () => {
                 <p className='text-2xl font-medium'>${room.pricePerNight}/night</p>
             </div>
             {/* Check in check out form */}
-            <form className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl'>
+            <form onSubmit={handleBooking} className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl'>
 
                 <div className='flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500'>
 
                     <div className='flex flex-col'>
                         <label htmlFor="checkInDate" className='font-medium'>Check-In</label>
-                        <input type="date" id='checkInDate' placeholder='Check-In' className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
+                        <input type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                     <div className='flex flex-col'>
                         <label htmlFor="checkOutDate" className='font-medium'>Check-Out</label>
-                        <input type="date" id='checkOutDate' placeholder='Check-Out' className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
+                        <input type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
-                    <div className='flex flex-col'>
-                        <label htmlFor="guests" className='font-medium'>Guests</label>
-                        <input type="number" id='guests' placeholder='0' className='max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
-                    </div>
                 </div>
 
                 <button type='submit' className='bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer'>
-                    Check Availability
+                    {checking ? "Checking..." : "Book now"}
                 </button>
             </form>
 

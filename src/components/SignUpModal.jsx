@@ -1,18 +1,27 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { createPortal } from "react-dom";
 
-export default function LoginModal({ onClose, switchToSignup }) {
+export default function SignUpModal({ onClose, switchToLogin }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const handleLogin = async (e) => {
+    const handleSignUp = async (e) => {
         e.preventDefault();
+
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            onClose();  // close modal after login
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await setDoc(doc(db, "users", user.uid), {
+                email: user.email,
+                role: "user",
+                createdAt: serverTimestamp(),
+            });
+            onClose();
         } catch (err) {
             setError(err.message);
         }
@@ -23,10 +32,10 @@ export default function LoginModal({ onClose, switchToSignup }) {
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
             <div className="rounded-xl">
                 <form
-                    onSubmit={handleLogin}
+                    onSubmit={handleSignUp}
                     className="bg-white text-gray-500 max-w-[340px] w-full mx-4 md:p-6 p-4 py-8 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
                 >
-                    <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Welcome Back</h2>
+                    <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Create Account</h2>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
@@ -65,12 +74,12 @@ export default function LoginModal({ onClose, switchToSignup }) {
                         type="submit"
                         className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600/90 transition py-2.5 rounded text-white font-medium"
                     >
-                        Log In
+                        Sign Up
                     </button>
 
                     <p className="text-center mt-4">
-                        Don’t have an account?
-                        <span onClick={switchToSignup} className="text-blue-500 underline cursor-pointer"> Signup </span>
+                        Already have an account?{" "}
+                        <span onClick={switchToLogin} className="text-blue-500 underline cursor-pointer"> Login </span>
                     </p>
                 </form>
             </div>
