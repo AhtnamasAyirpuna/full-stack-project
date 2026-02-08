@@ -27,7 +27,6 @@ export const assets = {
 };
 
 export const cities = [
-
     "Selangor",
     "Johor",
     "Penang",

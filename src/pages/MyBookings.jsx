@@ -75,7 +75,12 @@ const MyBookings = () => {
                 return;
             }
 
-            await fetch(`http://localhost:3000/api/bookings/${bookingId}`, {
+            if (new Date(newCheckOut) <= new Date(newCheckIn)) {
+                alert("Invalid dates. Check-out must be after check in");
+                return;
+            }
+
+            const res = await fetch(`http://localhost:3000/api/bookings/${bookingId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -86,6 +91,13 @@ const MyBookings = () => {
                     checkOutDate: newCheckOut
                 })
             });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.message || "Failed to update booking");
+                return;
+            }
 
             setEditingBooking(null);
 
